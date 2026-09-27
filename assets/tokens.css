@@ -1,0 +1,28 @@
+:root {
+  --ink: #171717;
+  --ink-muted: #6E6E6E;
+  --ink-faint: #8B8B8B;
+  --surface: #FFFFFF;
+  --surface-alt: #F7F6F4;
+  --surface-sunk: #E5E3E0;
+  --border: #E5E3E0;
+  --amber: #F2660D;
+  --amber-ink: #C24E08;
+  --amber-surface: #FDE7D8;
+  --teal: #157a72;
+  --teal-surface: #e4f4f2;
+  --brand-blue: #1f5c8a;
+  --brand-blue-deep: #16456a;
+  --brand-blue-surface: #e6eef4;
+  --brand-drop: #e08a2c;
+  --brand-drop-deep: #b5691a;
+  --radius-lg: 20px;
+  --radius-md: 16px;
+  --radius-sm: 12px;
+  --radius-pill: 999px;
+  --shadow-card: 0 1px 2px rgba(20,22,28,.04), 0 8px 20px -12px rgba(20,22,28,.12);
+  --shadow-lift: 0 24px 56px -28px rgba(20,22,28,.32);
+  --max-w: 1120px;
+  --font-display: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
