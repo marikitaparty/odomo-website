@@ -26,6 +26,8 @@
     />
     <link rel="stylesheet" href="assets/tokens.css" />
     <link rel="stylesheet" href="assets/site.css" />
+    <script src="assets/analytics-config.js" defer></script>
+    <script src="assets/analytics.js" defer></script>
     <script src="assets/site.js" defer></script>
   </head>
   <body>
@@ -429,22 +431,36 @@
           </p>
           <div class="download-area" id="downloads">
             <div class="store-links" aria-label="App downloads">
-              <div class="store-placeholder">
+              <a
+                class="store-placeholder store-link"
+                data-store="app_store"
+                data-store-url=""
+                role="link"
+                aria-disabled="true"
+                tabindex="0"
+              >
                 <img
                   src="appstore-badge.svg"
                   width="144"
                   height="48"
                   alt="Download on the App Store"
                 /><span>Listing pending</span>
-              </div>
-              <div class="store-placeholder">
+              </a>
+              <a
+                class="store-placeholder store-link"
+                data-store="google_play"
+                data-store-url=""
+                role="link"
+                aria-disabled="true"
+                tabindex="0"
+              >
                 <img
                   src="googleplay-badge.png"
                   width="154"
                   height="48"
                   alt="Get it on Google Play"
                 /><span>Listing pending</span>
-              </div>
+              </a>
             </div>
             <p class="availability">
               App Store and Google Play listings are on the way.
