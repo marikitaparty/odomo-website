@@ -1058,6 +1058,13 @@ dd {
   gap: 10px;
   align-items: center;
 }
+.store-link {
+  text-decoration: none;
+  cursor: default;
+}
+.store-link[href] {
+  cursor: pointer;
+}
 .store-placeholder span {
   font-size: 11px;
   color: var(--surface-sunk);

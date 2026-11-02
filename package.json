@@ -1,0 +1,14 @@
+{
+  "name": "odomo-website",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Odomo marketing site (odomo.marikita.party)",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test test/*.test.mjs",
+    "lint": "node --check assets/analytics.js && node --check assets/analytics-config.js && node --check assets/op1.js && node --check scripts/build.mjs && node --check test/site-analytics.test.mjs"
+  },
+  "devDependencies": {
+    "jsdom": "27.4.0"
+  }
+}
