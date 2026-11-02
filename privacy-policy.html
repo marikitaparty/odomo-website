@@ -6,7 +6,7 @@
     <title>Privacy Policy · Odomo</title>
     <meta
       name="description"
-      content="How your records, account, and selected photos are handled."
+      content="How your records, account, selected photos, and app diagnostics are handled."
     />
     <meta name="robots" content="noindex,nofollow" />
     <meta name="theme-color" content="#F7F6F4" />
@@ -69,8 +69,8 @@
           How your records, account, and selected photos are handled.
         </p>
         <p class="revision">
-          <span class="policy-version">Version 2026.09-1</span><br />
-          Last updated: <time datetime="2026-09-27">September 27, 2026</time>
+          <span class="policy-version">Version 2026.11-1</span><br />
+          Last updated: <time datetime="2026-11-02">November 2, 2026</time>
         </p>
       </div>
       <div class="wrap legal-body">
@@ -80,6 +80,9 @@
             <ol>
               <li><a href="#overview">About this policy</a></li>
               <li><a href="#collect">Information you provide</a></li>
+              <li>
+                <a href="#automatic">Information collected automatically</a>
+              </li>
               <li><a href="#use">How your information is used</a></li>
               <li><a href="#sync">Accounts and cloud synchronization</a></li>
               <li><a href="#ai">Vision AI and external processing</a></li>
@@ -102,8 +105,9 @@
             <p>
               This Privacy Policy explains how Odomo handles information when
               you use the app, account services, cloud sync, AI photo
-              processing, and this website. Odomo is operated by Rahmat Nugraha
-              under the Marikitaparty brand. Contact
+              processing, app analytics, crash reports, and this website.
+              Odomo is operated by Rahmat Nugraha under the Marikitaparty
+              brand. Contact
               <a href="mailto:support-odomo@marikita.party"
                 >support-odomo@marikita.party</a
               >
@@ -153,8 +157,112 @@
               possible.
             </p>
           </section>
+          <section id="automatic">
+            <h2>3. Information collected automatically</h2>
+            <p>
+              Odomo sends a small amount of technical information about how the
+              app is used, when it fails, and which store link led to an
+              installation. We use it to understand which features are used, to
+              find and fix crashes, and to measure whether our store links
+              work. It is not used to show you advertising, and we do not sell
+              it.
+            </p>
+            <p>
+              Analytics events and crash reports are received by servers we
+              operate ourselves, not by a third-party analytics or
+              crash-reporting service, and they are sent over an encrypted
+              connection. This information never includes your records, your
+              photos, the text read from a photo, your name, your email address,
+              or your account identifier.
+            </p>
+            <h3>App analytics</h3>
+            <p>
+              The app records a fixed list of usage events: that it was opened,
+              which onboarding step was shown, that a scan started and how it
+              resolved, that a paywall or purchase step was reached, that an
+              entry was added, and similar product events. Each event carries
+              the platform (Android, iOS or web), often the app language, and a
+              short value from a fixed list — an onboarding step, a scan tier, a
+              fallback reason, a paywall placement, a product id, an entry type,
+              or a bucketed count such as “6–20 entries” or “51+”. Values come
+              from fixed lists or are grouped into ranges; the app never sends
+              free text, values you type, vehicle details, odometer readings,
+              prices, fuel volumes, station or place names, notes, or text read
+              from a photo.
+            </p>
+            <p>
+              To keep one installation’s events together, the app generates a
+              random identifier for this installation on first launch. It is
+              not your account identifier, not a hardware or advertising
+              identifier, and not derived from your email or any other personal
+              detail. We do not link it to your account or combine it with data
+              from other apps or websites. The only campaign information we keep
+              is described under install attribution below.
+            </p>
+            <p>
+              You can turn app analytics off at any time in
+              <strong>Settings → Privacy → Anonymous analytics</strong>. App
+              analytics is on by default; turning it off stops all analytics
+              requests from this device and clears events that were waiting to
+              be sent. The choice is stored on this device and is not part of
+              your account, so signing out or using Odomo elsewhere does not
+              switch it back on. Turning it off does not delete events that were
+              already received; see sections 10 and 11.
+            </p>
+            <h3>Crash reports</h3>
+            <p>
+              If the app fails, it sends a crash report. A report contains the
+              error type and message, the code stack, the screen or route
+              involved, the app version and build, the operating-system version
+              and device model, and basic session counters. Our crash server
+              also records the connecting IP address.
+            </p>
+            <p>
+              Before a report leaves your device, a filter removes photo and
+              receipt references and file paths, access tokens, email
+              addresses, account, device and session identifiers, request
+              headers, bodies and query strings, any user field, your device’s
+              name, and the values of local variables in the stack.
+              Photographs, screenshots, the on-screen view hierarchy and
+              session recordings are never attached, and the app does not send
+              performance traces or failed-request contents.
+            </p>
+            <p>
+              Crash reports are not linked to your account or to the analytics
+              installation identifier. They are sent automatically and there is
+              currently no separate setting for them. See section 10 for how
+              long we keep them.
+            </p>
+            <h3>Install attribution</h3>
+            <p>
+              To understand which campaign or link led to an installation,
+              Odomo asks the store once, at first launch, for the install
+              referrer (Android) or an attribution token (iOS). From the answer
+              it keeps only campaign values — utm_source, utm_medium,
+              utm_campaign, utm_content and utm_term — and which store provided
+              them. The raw referrer and the Apple token are discarded
+              immediately and never stored or sent. Advertising and click
+              identifiers that a referrer may carry, such as Google click ids,
+              are not kept.
+            </p>
+            <p>
+              Attribution runs only while app analytics is on, and it is sent
+              once. With analytics off, the app does not read the referrer or
+              ask Apple for an attribution token at all.
+            </p>
+            <h3>Analytics on this website</h3>
+            <p>
+              The marketing website uses the same self-hosted service, without
+              cookies. It records a page view for each page you open (the page
+              path and page title, and the page you came from), the store badge
+              you click if any, and campaign values in the link that brought
+              you here. The tracker keeps its identifier in memory for the page
+              only and stores nothing in your browser, so this website cannot
+              recognise you across visits.
+            </p>
+          </section>
           <section id="use">
-            <h2>3. How your information is used</h2>
+            <h2>4. How your information is used</h2>
             <p>
               Account information supports sign-in, account access, and cloud
               synchronization. Vehicle records support your history,
@@ -172,7 +280,7 @@
             </p>
           </section>
           <section id="sync">
-            <h2>4. Accounts and cloud synchronization</h2>
+            <h2>5. Accounts and cloud synchronization</h2>
             <p>
               Odomo provides accounts and cloud synchronization. Records
               synchronized with your account are handled by online
@@ -189,7 +297,7 @@
             </p>
           </section>
           <section id="ai">
-            <h2>5. Vision AI and external processing</h2>
+            <h2>6. Vision AI and external processing</h2>
             <p>
               Odomo uses vision-capable large language models (LLM Vision AI) to
               read the fuel receipts and odometer photos you select. Processing
@@ -213,7 +321,7 @@
             </p>
           </section>
           <section id="zdr">
-            <h2>6. Our Zero Data Retention commitment</h2>
+            <h2>7. Our Zero Data Retention commitment</h2>
             <p>
               <strong
                 >We are committed to enabling Zero Data Retention (ZDR) for
@@ -242,7 +350,16 @@
             </p>
           </section>
           <section id="sharing">
-            <h2>7. Service providers and sharing</h2>
+            <h2>8. Service providers and sharing</h2>
+            <p>
+              The analytics and crash-reporting services described in section 3
+              are not third-party products. We run them ourselves on a server
+              we control, and we do not share what they receive with analytics
+              vendors, advertising networks, data brokers, or any other third
+              party. Traffic to that server passes through Cloudflare’s
+              network, which acts as our network provider. We do not sell
+              personal information.
+            </p>
             <p>
               Online infrastructure providers handle account and
               synchronized-record services. The AI aggregator and model
@@ -258,11 +375,31 @@
             </p>
           </section>
           <section id="transfers">
-            <h2>8. Processing locations and security</h2>
+            <h2>9. Processing locations and security</h2>
             <p>
               Cloud and AI providers may process information outside the country
               where you live. Contact support for provider and location details
               or questions about applicable safeguards.
+            </p>
+            <p>
+              Analytics events and crash reports are processed on a server we
+              operate ourselves, not by a third-party analytics or
+              crash-reporting platform. The resulting dashboards are not
+              reachable from the public internet; only the ingest endpoints,
+              events.marikita.party and errors.marikita.party (with their
+              staging equivalents), accept data. Contact support for the current
+              hosting location of that server.
+            </p>
+            <p>
+              The app ships the client credentials it needs to write analytics
+              events to that endpoint. They are not a secret in the security
+              sense, because anyone who inspects the app can read them. They are
+              the write credential for our project: they are not intended to
+              read stored data or open a dashboard, and they give no access to
+              your account. We rely on the endpoint rather than on secrecy —
+              only the ingest path is exposed, requests are restricted by origin
+              and rate limited — so a copied credential could at most add
+              misleading events to aggregate counts.
             </p>
             <p>
               Keep your account credentials secure and report suspected
@@ -273,13 +410,20 @@
             </p>
           </section>
           <section id="retention">
-            <h2>9. Retention and deletion</h2>
+            <h2>10. Retention and deletion</h2>
             <p>
               We keep account and synchronized records to provide the service
               while you maintain your account, subject to applicable deletion
               requests. Closing your account requests removal of your profile
               and associated vehicle records, saved entries, reminders, and
               stored attachments from active service storage.
+            </p>
+            <p>
+              We have not yet fixed a retention period for analytics events or
+              crash reports. Until we do, they remain stored on our self-hosted
+              systems and this policy states no period; when a period is set it
+              will be published here. Turning app analytics off stops new
+              events but does not remove events that were already received.
             </p>
             <p>
               Some information may need to remain for a legal obligation or a
@@ -295,7 +439,7 @@
             </p>
           </section>
           <section id="rights">
-            <h2>10. Your choices and privacy rights</h2>
+            <h2>11. Your choices and privacy rights</h2>
             <p>
               You can request access, correction, deletion, or information about
               the processing of your personal data by contacting
@@ -311,13 +455,26 @@
               rights do not depend on purchasing Premium.
             </p>
             <p>
+              You can stop app analytics and install attribution at any time in
+              <strong>Settings → Privacy → Anonymous analytics</strong>, as
+              described in section 3. Crash reports currently have no separate
+              setting.
+            </p>
+            <p>
+              To ask us to delete analytics events or crash reports, contact us
+              using the address above. Because those streams are not linked to
+              your account, we may need information from you to find the
+              records, and we may not be able to identify all of them; we will
+              explain what we can do in your case.
+            </p>
+            <p>
               You can manage camera and photo permissions through your device
               settings and use manual entry without submitting an image for AI
               processing.
             </p>
           </section>
           <section id="plans">
-            <h2>11. Free plan and future Premium</h2>
+            <h2>12. Free plan and future Premium</h2>
             <p>
               Odomo currently offers a <strong>free plan</strong>. Premium is
               planned for the future and is not currently offered for purchase.
@@ -327,7 +484,7 @@
             </p>
           </section>
           <section id="children">
-            <h2>12. Children’s information</h2>
+            <h2>13. Children’s information</h2>
             <p>
               Odomo is intended for people who can manage vehicle records and
               lawfully use the service. If you believe a child has provided
@@ -340,7 +497,7 @@
             </p>
           </section>
           <section id="changes">
-            <h2>13. Policy updates and contact</h2>
+            <h2>14. Policy updates and contact</h2>
             <p>
               We may update this policy when Odomo’s features, processing
               arrangements, or applicable requirements change. The revision date
