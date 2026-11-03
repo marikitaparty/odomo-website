@@ -71,8 +71,8 @@
           How your records, account, and selected photos are handled.
         </p>
         <p class="revision">
-          <span class="policy-version">Version 2026.11-1</span><br />
-          Last updated: <time datetime="2026-11-02">November 2, 2026</time>
+          <span class="policy-version">Version 2026.11-2</span><br />
+          Last updated: <time datetime="2026-11-03">November 3, 2026</time>
         </p>
       </div>
       <div class="wrap legal-body">
@@ -97,6 +97,7 @@
               <li><a href="#rights">Your choices and privacy rights</a></li>
               <li><a href="#plans">Free plan and future Premium</a></li>
               <li><a href="#children">Children’s information</a></li>
+              <li><a href="#drive">Google Drive sync backup</a></li>
               <li><a href="#changes">Policy updates and contact</a></li>
             </ol>
           </details>
@@ -288,7 +289,9 @@
               synchronized with your account are handled by online
               infrastructure and are not confined to your phone. Signing out or
               uninstalling the app does not, by itself, close your account or
-              delete synchronized data.
+              delete synchronized data. Section 14 describes the optional
+              alternative where the same synchronized copy is kept in your own
+              Google Drive instead.
             </p>
             <p>
               To close your account and request deletion of associated records,
@@ -498,8 +501,87 @@
               applicable law.
             </p>
           </section>
+          <section id="drive">
+            <h2>14. Google Drive sync backup</h2>
+            <p>
+              For cloud synchronization, Odomo can also keep the copy of your
+              synchronized records in your own Google Drive instead of Odomo’s
+              infrastructure. In that case the app writes an encrypted copy into
+              the hidden application data folder that Google provides to Odomo
+              inside your Drive (the app-private folder named
+              <strong>appDataFolder</strong>). This route is optional: it is
+              used only if the app offers it, you choose it, and you grant the
+              Google access described below. Otherwise synchronization works as
+              described in section 5.
+            </p>
+            <p>
+              The route uses a single Google scope:
+              <strong>https://www.googleapis.com/auth/drive.appdata</strong>.
+              That scope reaches only Odomo’s own application data folder. It
+              does not allow Odomo to list, open, change, or delete any other
+              file in your Drive, including files you created yourself and
+              anything in shared drives.
+            </p>
+            <p>
+              The copy is stored as a few files with opaque names. Its contents
+              are encrypted with a key held by Odomo’s account service, and that
+              key is never sent to Google. Google cannot read your records,
+              entry values, vehicle details, or photos; only Odomo can decrypt
+              the copy. Google’s own systems can see that the app created files
+              in your folder, their names, their sizes, and their modification
+              times, plus the numbers and commit times inside the small index
+              file that orders the copy. Those values show roughly how much and
+              how often you synchronize and nothing about what you store.
+            </p>
+            <p>
+              The folder counts toward the storage quota of the Google Account
+              you connect. If that quota is full, the Drive copy stops updating
+              and the app reports a synchronization error; the records on your
+              device are not affected. Odomo’s servers never receive your Drive
+              traffic or your Google access token, and the token stays on your
+              device.
+            </p>
+            <p>
+              You can stop this route and remove the copy at any time:
+            </p>
+            <ul>
+              <li>
+                Revoke Odomo’s access to your Google Account under
+                <a href="https://myaccount.google.com/permissions" rel="noopener"
+                  >Google Account → Data &amp; privacy → Third-party apps &amp;
+                  services</a
+                >. Revocation stops all Drive use immediately, and the app asks
+                you to grant access again if you later want the route back.
+              </li>
+              <li>
+                Delete Odomo’s hidden application data under
+                <a href="https://drive.google.com/drive/settings" rel="noopener"
+                  >Google Drive settings → Manage apps</a
+                >, which removes the files Odomo stored in your Drive.
+              </li>
+            </ul>
+            <p>
+              Revoking access does not by itself delete the encrypted files;
+              until they are removed they stay unreadable to Google. Odomo also
+              deletes the Drive copy when your account returns to Odomo’s own
+              cloud synchronization. Closing your Odomo account does not delete
+              files held in your Google Drive, because they belong to your
+              Google Account; use the steps above for those.
+            </p>
+            <p>
+              Odomo’s use of information received from Google APIs adheres to
+              the
+              <a
+                href="https://developers.google.com/terms/api-services-user-data-policy"
+                rel="noopener"
+                >Google API Services User Data Policy</a
+              >, including the Limited Use requirements. The Drive copy is used
+              only to synchronize the records you keep in Odomo: it is not sold,
+              not used for advertising, and not transferred to anyone else.
+            </p>
+          </section>
           <section id="changes">
-            <h2>14. Policy updates and contact</h2>
+            <h2>15. Policy updates and contact</h2>
             <p>
               We may update this policy when Odomo’s features, processing
               arrangements, or applicable requirements change. The revision date
