@@ -77,6 +77,21 @@ Cloudflare Pages: if the project deploys the repository root, the committed
 config is used and nothing else is needed. If it runs a build, use
 `npm run build` with output directory `dist` and set the two variables above.
 
+### Deploying
+
+The `odomo-website` Pages project has **no Git integration**: merging to `main`
+publishes nothing. Deploy from a clean `main` checkout after the checks pass:
+
+```sh
+git pull --ff-only
+npm test && npm run build
+npx wrangler pages deploy dist --project-name odomo-website --branch main
+```
+
+Verify the live pages by content, not status code: the custom domain redirects
+`*.html` to the clean path (`/privacy-policy`, `/terms-of-service`) and the
+redirect's own body is empty, so `curl -L` is required.
+
 ### Store links (pending listings)
 
 Both badges are inert while the listings are pending: clicks are counted, and
