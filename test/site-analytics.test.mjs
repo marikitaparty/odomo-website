@@ -108,7 +108,7 @@ test("every page loads the config before the integration", async () => {
 
 test("get landing page keeps its Play action inert and counts allowed campaign values", async () => {
   const dom = new JSDOM(GET_HTML, {
-    url: "https://odomo.marikita.party/get?utm_source=meta&utm_campaign=x&foo=1",
+    url: "https://odomo.marikita.party/get?utm_source=meta&utm_campaign=launch&foo=1",
     runScripts: "outside-only",
     pretendToBeVisual: true,
   });
@@ -125,7 +125,7 @@ test("get landing page keeps its Play action inert and counts allowed campaign v
   );
   assert.equal(storeClick?.[2].store, "google_play");
   assert.equal(storeClick?.[2].utm_source, "meta");
-  assert.equal(storeClick?.[2].utm_campaign, "x");
+  assert.equal(storeClick?.[2].utm_campaign, "launch");
   assert.equal(storeClick?.[2].foo, undefined);
 });
 
@@ -209,9 +209,9 @@ test("a client id starts the tracker and sends one pageview with the campaign", 
   assert.equal(pageview.properties.__referrer, "https://news.example/article");
 });
 
-test("pageview URLs retain campaign keys but drop unknown and PII query parameters", async () => {
+test("pageview URLs retain approved campaign values and drop unknown query parameters", async () => {
   const url =
-    "https://odomo.marikita.party/get?utm_source=meta&utm_campaign=x&email=alice%40example.com&foo=1";
+    "https://odomo.marikita.party/get?utm_source=meta&utm_campaign=launch&email=alice%40example.com&foo=1";
   const { window, requests } = mount({
     config: { clientId: "test-client", apiUrl: API_URL },
     url,
@@ -222,37 +222,45 @@ test("pageview URLs retain campaign keys but drop unknown and PII query paramete
   await flush();
 
   const [pageview] = trackedEvents(requests);
-  assert.equal(
-    pageview.properties.__path,
-    "https://odomo.marikita.party/get?utm_source=meta&utm_campaign=x",
-  );
-  assert.equal(window.location.search, "?utm_source=meta&utm_campaign=x");
+  const safePath = "https://odomo.marikita.party/get?utm_source=meta&utm_campaign=launch";
+  assert.equal(pageview.properties.__path, safePath);
+  assert.equal(window.location.search, "?utm_source=meta&utm_campaign=launch");
   assert.equal(pageview.properties.utm_source, "meta");
-  assert.equal(pageview.properties.utm_campaign, "x");
+  assert.equal(pageview.properties.utm_campaign, "launch");
   assert.doesNotMatch(JSON.stringify(pageview.properties), /alice|email|foo/i);
 });
 
-test("pageview UTM values that look like contact details are dropped", async () => {
+test("pageview and store links drop unapproved or free-text UTM values", async () => {
   const url =
-    "https://odomo.marikita.party/get?utm_source=alice%40example.com&utm_term=6281234567890&utm_campaign=launch&utm_content=2026-11-05";
+    "https://odomo.marikita.party/get?utm_source=alice%40example.com&utm_term=6281234567890&utm_campaign=Jane%20Doe&utm_content=hero";
+  const html = GET_HTML.replace(
+    'data-store="google_play" data-store-url=""',
+    'data-store="google_play" data-store-url="https://play.google.com/store/apps/details?id=com.useodomo.app"',
+  );
   const { window, requests } = mount({
     config: { clientId: "test-client", apiUrl: API_URL },
     url,
-    html: GET_HTML,
+    html,
   });
 
   loadSdk(window);
   await flush();
 
   const [pageview] = trackedEvents(requests);
-  const safePath = "https://odomo.marikita.party/get?utm_campaign=launch&utm_content=2026-11-05";
+  const safePath = "https://odomo.marikita.party/get?utm_content=hero";
   assert.equal(pageview.properties.__path, safePath);
-  assert.equal(window.location.search, "?utm_campaign=launch&utm_content=2026-11-05");
+  assert.equal(window.location.search, "?utm_content=hero");
   assert.equal(pageview.properties.utm_source, undefined);
   assert.equal(pageview.properties.utm_term, undefined);
-  assert.equal(pageview.properties.utm_campaign, "launch");
-  assert.equal(pageview.properties.utm_content, "2026-11-05");
-  assert.doesNotMatch(JSON.stringify(pageview.properties), /alice|6281234567890/i);
+  assert.equal(pageview.properties.utm_campaign, undefined);
+  assert.equal(pageview.properties.utm_content, "hero");
+  assert.doesNotMatch(JSON.stringify(pageview.properties), /alice|6281234567890|Jane Doe/i);
+
+  const storeUrl = new URL(window.document.querySelector('[data-store="google_play"]').href);
+  assert.equal(storeUrl.searchParams.get("utm_content"), "hero");
+  assert.equal(storeUrl.searchParams.get("utm_source"), null);
+  assert.equal(storeUrl.searchParams.get("utm_campaign"), null);
+  assert.doesNotMatch(storeUrl.toString(), /alice|6281234567890|Jane|utm_term/i);
 });
 
 
@@ -341,7 +349,7 @@ test("configured store links carry the campaign, and Play an install referrer", 
   );
 });
 
-test("campaign values are trimmed and bounded", async () => {
+test("approved campaign values are trimmed and unknown values are dropped", async () => {
   const long = "a".repeat(500);
   const url = `https://odomo.marikita.party/?utm_source=%20%09newsletter%20&utm_campaign=${long}`;
   const { window, requests } = mount({
@@ -353,7 +361,8 @@ test("campaign values are trimmed and bounded", async () => {
 
   const [pageview] = trackedEvents(requests);
   assert.equal(pageview.properties.utm_source, "newsletter");
-  assert.equal(pageview.properties.utm_campaign.length, 120);
+  assert.equal(pageview.properties.utm_campaign, undefined);
+  assert.equal(window.location.search, "?utm_source=newsletter");
 });
 
 function runBuild(out, env) {

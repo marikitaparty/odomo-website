@@ -47,10 +47,13 @@ Every page includes both scripts, config first:
 - `screen_view` once per page load. The tracker adds `__path`, `__title` and
   `__referrer` (the referring site).
 - `store_click` when an App Store or Google Play badge is clicked:
-  `store` (`app_store` | `google_play`), the `utm_*` campaign parameters, and
-  `destination` when the store URL is configured.
-- `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term` from the
-  landing URL are attached to every event, trimmed to 120 characters.
+  `store` (`app_store` | `google_play`), the approved `utm_*` campaign
+  parameters, and `destination` when the store URL is configured.
+- Only the reviewed values in `assets/analytics.js` are retained; unknown and
+  free-text values are dropped before analytics, URL rewriting, or store links.
+- `utm_term` is always dropped because it is free-form search text. Add new
+  campaign labels to the per-key allowlist only after review; values are
+  case-insensitive and bounded to 120 characters.
 
 Request bodies go to `${apiUrl}/track` (`https://events.marikita.party/api/track`
 in production).
