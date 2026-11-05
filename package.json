@@ -6,7 +6,7 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "test": "node --test test/*.test.mjs",
-    "lint": "node --check assets/analytics.js && node --check assets/analytics-config.js && node --check assets/op1.js && node --check scripts/build.mjs && node --check test/site-analytics.test.mjs"
+    "lint": "node --check assets/analytics.js && node --check assets/analytics-config.js && node --check assets/get.js && node --check assets/op1.js && node --check scripts/build.mjs && node --check test/site-analytics.test.mjs"
   },
   "devDependencies": {
     "jsdom": "27.4.0"

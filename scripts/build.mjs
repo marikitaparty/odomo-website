@@ -24,6 +24,7 @@ const DEPLOY_ENTRIES = [
   "account-deletion.html",
   "appstore-badge.svg",
   "assets",
+  "get.html",
   "googleplay-badge.png",
   "hero-app-screenshot.png",
   "index-website.html",

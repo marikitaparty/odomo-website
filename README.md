@@ -14,6 +14,16 @@ python3 -m http.server 8000    # or any static file server
 Open <http://localhost:8000/>. The analytics origin allow-list includes
 `localhost`, so tracking works locally against production OpenPanel.
 
+## Page map
+
+| Path | Page |
+| --- | --- |
+| `/` | Main marketing site |
+| `/get` | Campaign landing page for app downloads (`get.html`) |
+| `/account-deletion` | Account deletion instructions |
+| `/privacy-policy` | Privacy policy |
+| `/terms-of-service` | Terms of service |
+
 ## Analytics (MKP-287)
 
 Cookieless, self-hosted OpenPanel: pageviews, referrers, UTM parameters and the

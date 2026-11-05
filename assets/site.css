@@ -169,6 +169,21 @@ main:focus {
   background: var(--amber-ink);
   color: var(--surface);
 }
+
+.get-benefits {
+  margin: 0 0 28px;
+  padding-left: 22px;
+  color: var(--ink-muted);
+}
+.get-benefits li + li {
+  margin-top: 10px;
+}
+.get-hero-art img {
+  width: min(100%, 520px);
+  margin: auto;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lift);
+}
 .text-link {
   display: inline-flex;
   align-items: center;

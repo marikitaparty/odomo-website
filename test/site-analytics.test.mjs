@@ -19,13 +19,15 @@ const read = (file) => readFile(path.join(REPO, file), "utf8");
 const PAGES = [
   "index.html",
   "index-website.html",
+  "get.html",
   "account-deletion.html",
   "privacy-policy.html",
   "terms-of-service.html",
 ];
 
-const [HTML, ANALYTICS, SDK, COMMITTED_CONFIG] = await Promise.all([
+const [HTML, GET_HTML, ANALYTICS, SDK, COMMITTED_CONFIG] = await Promise.all([
   read("index.html"),
+  read("get.html"),
   read("assets/analytics.js"),
   read("assets/op1.js"),
   read("assets/analytics-config.js"),
@@ -100,6 +102,29 @@ test("every page loads the config before the integration", async () => {
       `${page} must load assets/analytics-config.js before assets/analytics.js`,
     );
   }
+});
+
+test("get landing page keeps its Play action inert and counts allowed campaign values", async () => {
+  const dom = new JSDOM(GET_HTML, {
+    url: "https://odomo.marikita.party/get?utm_source=meta&utm_campaign=x&foo=1",
+    runScripts: "outside-only",
+    pretendToBeVisual: true,
+  });
+  const { window } = dom;
+  window.ODOMO_ANALYTICS = { clientId: "test-client", apiUrl: API_URL };
+  window.eval(ANALYTICS);
+  const play = window.document.querySelector('[data-store="google_play"]');
+  assert.equal(play.getAttribute("href"), null);
+  assert.equal(play.getAttribute("data-store-url"), "");
+  const clickEvent = click(window, '[data-store="google_play"]');
+  assert.equal(clickEvent.defaultPrevented, true);
+  const storeClick = window.op.q.find(
+    ([method, name]) => method === "track" && name === "store_click",
+  );
+  assert.equal(storeClick?.[2].store, "google_play");
+  assert.equal(storeClick?.[2].utm_source, "meta");
+  assert.equal(storeClick?.[2].utm_campaign, "x");
+  assert.equal(storeClick?.[2].foo, undefined);
 });
 
 test("the committed config carries the public client id and the API base", () => {
