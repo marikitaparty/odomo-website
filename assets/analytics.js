@@ -22,26 +22,25 @@
     "utm_content",
     "utm_term",
   ];
-  const MAX_UTM_LENGTH = 120;
-  // Free-form values can contain names or other personal data. Add only
-  // reviewed campaign vocabulary; utm_term is intentionally never forwarded.
-  const SAFE_UTM_VALUES = {
-    utm_source: new Set(["meta", "newsletter"]),
-    utm_medium: new Set(["email"]),
-    utm_campaign: new Set(["launch"]),
-    utm_content: new Set(["hero"]),
-    utm_term: new Set(),
-  };
+  const MAX_UTM_LENGTH = 64;
+  // Match the app's attribution slug contract: no spaces, "@", or free text.
+  // This preserves arbitrary campaign tokens (including the required `x`)
+  // without forwarding names, emails, or phone-number-shaped values.
+  const UTM_SLUG = /^[a-z0-9_.-]+$/;
 
-  /** Retain only approved campaign labels; unknown and free-text values are dropped. */
-  function readUtmValue(key, raw) {
+  /** Keep short slug values; drop free text and phone-number-shaped values. */
+  function readUtmValue(raw) {
     if (typeof raw !== "string") return "";
     const value = raw
       .replace(/[\u0000-\u001f\u007f]/g, "")
       .trim()
-      .slice(0, MAX_UTM_LENGTH)
       .toLowerCase();
-    return SAFE_UTM_VALUES[key].has(value) ? value : "";
+    if (value.length === 0 || value.length > MAX_UTM_LENGTH) return "";
+    const phoneDigits = value.replace(/[.-]/g, "");
+    const phoneLike =
+      /^[\d.-]+$/.test(value) && /^\d{7,15}$/.test(phoneDigits);
+    if (!UTM_SLUG.test(value) || phoneLike) return "";
+    return value;
   }
 
   /** The utm_* parameters on the current URL, shaped as event properties. */
@@ -49,7 +48,7 @@
     const params = new URLSearchParams(search);
     const campaign = {};
     for (const key of UTM_KEYS) {
-      const value = readUtmValue(key, params.get(key));
+      const value = readUtmValue(params.get(key));
       if (value) campaign[key] = value;
     }
     return campaign;

@@ -49,11 +49,12 @@ Every page includes both scripts, config first:
 - `store_click` when an App Store or Google Play badge is clicked:
   `store` (`app_store` | `google_play`), the approved `utm_*` campaign
   parameters, and `destination` when the store URL is configured.
-- Only the reviewed values in `assets/analytics.js` are retained; unknown and
-  free-text values are dropped before analytics, URL rewriting, or store links.
-- `utm_term` is always dropped because it is free-form search text. Add new
-  campaign labels to the per-key allowlist only after review; values are
-  case-insensitive and bounded to 120 characters.
+- Only `utm_source`, `utm_medium`, `utm_campaign`, `utm_content` and
+  `utm_term` are considered. Unknown query parameters are dropped.
+- Values are lowercased, trimmed, limited to 64 characters and must match the
+  attribution-slug format `[a-z0-9_.-]+`; free text and phone-shaped values
+  (7–15 digits) are dropped before analytics, URL rewriting or store links.
+  `utm_term` is retained only when it meets the same slug rules.
 
 Request bodies go to `${apiUrl}/track` (`https://events.marikita.party/api/track`
 in production).

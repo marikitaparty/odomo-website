@@ -230,9 +230,37 @@ test("pageview URLs retain approved campaign values and drop unknown query param
   assert.doesNotMatch(JSON.stringify(pageview.properties), /alice|email|foo/i);
 });
 
-test("pageview and store links drop unapproved or free-text UTM values", async () => {
+test("the documented meta campaign slug reaches Play as an install referrer", async () => {
+  const html = GET_HTML.replace(
+    'data-store="google_play" data-store-url=""',
+    'data-store="google_play" data-store-url="https://play.google.com/store/apps/details?id=com.useodomo.app"',
+  );
+  const { window, requests } = mount({
+    config: { clientId: "test-client", apiUrl: API_URL },
+    url: "https://odomo.marikita.party/get?utm_source=meta&utm_campaign=x&foo=1",
+    html,
+  });
+  loadSdk(window);
+  await flush();
+
+  const [pageview] = trackedEvents(requests);
+  assert.equal(
+    pageview.properties.__path,
+    "https://odomo.marikita.party/get?utm_source=meta&utm_campaign=x",
+  );
+  assert.equal(window.location.search, "?utm_source=meta&utm_campaign=x");
+  const playUrl = new window.URL(
+    window.document.querySelector('[data-store="google_play"]').href,
+  );
+  assert.equal(playUrl.searchParams.get("utm_source"), "meta");
+  assert.equal(playUrl.searchParams.get("utm_campaign"), "x");
+  assert.equal(playUrl.searchParams.get("referrer"), "utm_source=meta&utm_campaign=x");
+  assert.equal(playUrl.searchParams.get("foo"), null);
+});
+
+test("pageview and store links drop unapproved, free-text and phone-like UTM values", async () => {
   const url =
-    "https://odomo.marikita.party/get?utm_source=alice%40example.com&utm_term=6281234567890&utm_campaign=Jane%20Doe&utm_content=hero";
+    "https://odomo.marikita.party/get?utm_source=alice%40example.com&utm_medium=555-123-4567&utm_term=6281234567890&utm_campaign=Jane%20Doe&utm_content=hero";
   const html = GET_HTML.replace(
     'data-store="google_play" data-store-url=""',
     'data-store="google_play" data-store-url="https://play.google.com/store/apps/details?id=com.useodomo.app"',
@@ -251,16 +279,17 @@ test("pageview and store links drop unapproved or free-text UTM values", async (
   assert.equal(pageview.properties.__path, safePath);
   assert.equal(window.location.search, "?utm_content=hero");
   assert.equal(pageview.properties.utm_source, undefined);
+  assert.equal(pageview.properties.utm_medium, undefined);
   assert.equal(pageview.properties.utm_term, undefined);
   assert.equal(pageview.properties.utm_campaign, undefined);
   assert.equal(pageview.properties.utm_content, "hero");
-  assert.doesNotMatch(JSON.stringify(pageview.properties), /alice|6281234567890|Jane Doe/i);
+  assert.doesNotMatch(JSON.stringify(pageview.properties), /alice|555-123-4567|6281234567890|Jane Doe/i);
 
   const storeUrl = new URL(window.document.querySelector('[data-store="google_play"]').href);
   assert.equal(storeUrl.searchParams.get("utm_content"), "hero");
   assert.equal(storeUrl.searchParams.get("utm_source"), null);
   assert.equal(storeUrl.searchParams.get("utm_campaign"), null);
-  assert.doesNotMatch(storeUrl.toString(), /alice|6281234567890|Jane|utm_term/i);
+  assert.doesNotMatch(storeUrl.toString(), /alice|555-123-4567|6281234567890|Jane|utm_term/i);
 });
 
 
