@@ -14,6 +14,16 @@ python3 -m http.server 8000    # or any static file server
 Open <http://localhost:8000/>. The analytics origin allow-list includes
 `localhost`, so tracking works locally against production OpenPanel.
 
+## Page map
+
+| Path | Page |
+| --- | --- |
+| `/` | Main marketing site |
+| `/get` | Campaign landing page for app downloads (`get.html`) |
+| `/account-deletion` | Account deletion instructions |
+| `/privacy-policy` | Privacy policy |
+| `/terms-of-service` | Terms of service |
+
 ## Analytics (MKP-287)
 
 Cookieless, self-hosted OpenPanel: pageviews, referrers, UTM parameters and the
@@ -37,10 +47,15 @@ Every page includes both scripts, config first:
 - `screen_view` once per page load. The tracker adds `__path`, `__title` and
   `__referrer` (the referring site).
 - `store_click` when an App Store or Google Play badge is clicked:
-  `store` (`app_store` | `google_play`), the `utm_*` campaign parameters, and
-  `destination` when the store URL is configured.
-- `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term` from the
-  landing URL are attached to every event, trimmed to 120 characters.
+  `store` (`app_store` | `google_play`), the approved `utm_*` campaign
+  parameters, and `destination` when the store URL is configured.
+- Only `utm_source`, `utm_medium`, `utm_campaign`, `utm_content` and
+  `utm_term` are considered. Unknown query parameters are dropped.
+- Control characters are rejected. Other values are lowercased, trimmed,
+  limited to 64 characters and must match the attribution-slug format
+  `[a-z0-9_.-]+`; free text and phone-shaped values (7–15 digits) are dropped
+  before analytics, URL rewriting or store links. `utm_term` is retained only
+  when it meets the same slug rules.
 
 Request bodies go to `${apiUrl}/track` (`https://events.marikita.party/api/track`
 in production).

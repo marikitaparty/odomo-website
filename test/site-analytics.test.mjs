@@ -19,25 +19,29 @@ const read = (file) => readFile(path.join(REPO, file), "utf8");
 const PAGES = [
   "index.html",
   "index-website.html",
+  "get.html",
   "account-deletion.html",
   "privacy-policy.html",
   "terms-of-service.html",
 ];
 
-const [HTML, ANALYTICS, SDK, COMMITTED_CONFIG] = await Promise.all([
-  read("index.html"),
-  read("assets/analytics.js"),
-  read("assets/op1.js"),
-  read("assets/analytics-config.js"),
-]);
+const [HTML, GET_HTML, GET_JS, ANALYTICS, SDK, COMMITTED_CONFIG] =
+  await Promise.all([
+    read("index.html"),
+    read("get.html"),
+    read("assets/get.js"),
+    read("assets/analytics.js"),
+    read("assets/op1.js"),
+    read("assets/analytics-config.js"),
+  ]);
 
 const API_URL = "https://events.example/api";
 const CAMPAIGN_URL =
   "https://odomo.marikita.party/?utm_source=newsletter&utm_medium=email&utm_campaign=launch&utm_content=hero";
 
 /** Mounts a page, stubs fetch, then runs analytics.js with `config` in place. */
-function mount({ config, url = CAMPAIGN_URL, beforeInit } = {}) {
-  const dom = new JSDOM(HTML, {
+function mount({ config, url = CAMPAIGN_URL, beforeInit, html = HTML } = {}) {
+  const dom = new JSDOM(html, {
     url,
     referrer: "https://news.example/article",
     runScripts: "outside-only",
@@ -102,6 +106,56 @@ test("every page loads the config before the integration", async () => {
   }
 });
 
+test("get landing page keeps its Play action inert and counts allowed campaign values", async () => {
+  const dom = new JSDOM(GET_HTML, {
+    url: "https://odomo.marikita.party/get?utm_source=meta&utm_campaign=launch&foo=1",
+    runScripts: "outside-only",
+    pretendToBeVisual: true,
+  });
+  const { window } = dom;
+  window.ODOMO_ANALYTICS = { clientId: "test-client", apiUrl: API_URL };
+  window.eval(ANALYTICS);
+  const play = window.document.querySelector('[data-store="google_play"]');
+  assert.equal(play.getAttribute("href"), null);
+  assert.equal(play.getAttribute("data-store-url"), "");
+  const clickEvent = click(window, '[data-store="google_play"]');
+  assert.equal(clickEvent.defaultPrevented, true);
+  const storeClick = window.op.q.find(
+    ([method, name]) => method === "track" && name === "store_click",
+  );
+  assert.equal(storeClick?.[2].store, "google_play");
+  assert.equal(storeClick?.[2].utm_source, "meta");
+  assert.equal(storeClick?.[2].utm_campaign, "launch");
+  assert.equal(storeClick?.[2].foo, undefined);
+});
+
+test("iPadOS desktop-mode user agents lead with the parked App Store control", () => {
+  const dom = new JSDOM(GET_HTML, {
+    url: "https://odomo.marikita.party/get",
+    runScripts: "outside-only",
+    beforeParse(window) {
+      Object.defineProperty(window.navigator, "userAgent", {
+        configurable: true,
+        value:
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15) " +
+          "AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Safari/605.1.15",
+      });
+      Object.defineProperty(window.navigator, "maxTouchPoints", {
+        configurable: true,
+        value: 5,
+      });
+    },
+  });
+
+  dom.window.eval(GET_JS);
+  assert.deepEqual(
+    [...dom.window.document.querySelectorAll("[data-store]")].map((store) =>
+      store.getAttribute("data-store"),
+    ),
+    ["app_store", "google_play"],
+  );
+});
+
 test("the committed config carries the public client id and the API base", () => {
   const clientId = COMMITTED_CONFIG.match(/clientId:\s*"([^"]*)"/)?.[1];
   assert.match(clientId ?? "", /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
@@ -154,6 +208,90 @@ test("a client id starts the tracker and sends one pageview with the campaign", 
   assert.equal(pageview.properties.__path, CAMPAIGN_URL);
   assert.equal(pageview.properties.__referrer, "https://news.example/article");
 });
+
+test("pageview URLs retain approved campaign values and drop unknown query parameters", async () => {
+  const url =
+    "https://odomo.marikita.party/get?utm_source=meta&utm_campaign=launch&email=alice%40example.com&foo=1";
+  const { window, requests } = mount({
+    config: { clientId: "test-client", apiUrl: API_URL },
+    url,
+    html: GET_HTML,
+  });
+
+  loadSdk(window);
+  await flush();
+
+  const [pageview] = trackedEvents(requests);
+  const safePath = "https://odomo.marikita.party/get?utm_source=meta&utm_campaign=launch";
+  assert.equal(pageview.properties.__path, safePath);
+  assert.equal(window.location.search, "?utm_source=meta&utm_campaign=launch");
+  assert.equal(pageview.properties.utm_source, "meta");
+  assert.equal(pageview.properties.utm_campaign, "launch");
+  assert.doesNotMatch(JSON.stringify(pageview.properties), /alice|email|foo/i);
+});
+
+test("the documented meta campaign slug reaches Play as an install referrer", async () => {
+  const html = GET_HTML.replace(
+    'data-store="google_play" data-store-url=""',
+    'data-store="google_play" data-store-url="https://play.google.com/store/apps/details?id=com.useodomo.app"',
+  );
+  const { window, requests } = mount({
+    config: { clientId: "test-client", apiUrl: API_URL },
+    url: "https://odomo.marikita.party/get?utm_source=meta&utm_campaign=x&foo=1",
+    html,
+  });
+  loadSdk(window);
+  await flush();
+
+  const [pageview] = trackedEvents(requests);
+  assert.equal(
+    pageview.properties.__path,
+    "https://odomo.marikita.party/get?utm_source=meta&utm_campaign=x",
+  );
+  assert.equal(window.location.search, "?utm_source=meta&utm_campaign=x");
+  const playUrl = new window.URL(
+    window.document.querySelector('[data-store="google_play"]').href,
+  );
+  assert.equal(playUrl.searchParams.get("utm_source"), "meta");
+  assert.equal(playUrl.searchParams.get("utm_campaign"), "x");
+  assert.equal(playUrl.searchParams.get("referrer"), "utm_source=meta&utm_campaign=x");
+  assert.equal(playUrl.searchParams.get("foo"), null);
+});
+
+test("pageview and store links drop unapproved, free-text and phone-like UTM values", async () => {
+  const url =
+    "https://odomo.marikita.party/get?utm_source=alice%40example.com&utm_medium=555-123-4567&utm_term=6281234567890&utm_campaign=Jane%0ADoe&utm_content=hero";
+  const html = GET_HTML.replace(
+    'data-store="google_play" data-store-url=""',
+    'data-store="google_play" data-store-url="https://play.google.com/store/apps/details?id=com.useodomo.app"',
+  );
+  const { window, requests } = mount({
+    config: { clientId: "test-client", apiUrl: API_URL },
+    url,
+    html,
+  });
+
+  loadSdk(window);
+  await flush();
+
+  const [pageview] = trackedEvents(requests);
+  const safePath = "https://odomo.marikita.party/get?utm_content=hero";
+  assert.equal(pageview.properties.__path, safePath);
+  assert.equal(window.location.search, "?utm_content=hero");
+  assert.equal(pageview.properties.utm_source, undefined);
+  assert.equal(pageview.properties.utm_medium, undefined);
+  assert.equal(pageview.properties.utm_term, undefined);
+  assert.equal(pageview.properties.utm_campaign, undefined);
+  assert.equal(pageview.properties.utm_content, "hero");
+  assert.doesNotMatch(JSON.stringify(pageview.properties), /alice|555-123-4567|6281234567890|Jane Doe/i);
+
+  const storeUrl = new URL(window.document.querySelector('[data-store="google_play"]').href);
+  assert.equal(storeUrl.searchParams.get("utm_content"), "hero");
+  assert.equal(storeUrl.searchParams.get("utm_source"), null);
+  assert.equal(storeUrl.searchParams.get("utm_campaign"), null);
+  assert.doesNotMatch(storeUrl.toString(), /alice|555-123-4567|6281234567890|Jane|utm_term/i);
+});
+
 
 test("session replay cannot start", async () => {
   const { window, requests } = mount({
@@ -240,7 +378,7 @@ test("configured store links carry the campaign, and Play an install referrer", 
   );
 });
 
-test("campaign values are trimmed and bounded", async () => {
+test("approved campaign values are trimmed and unknown values are dropped", async () => {
   const long = "a".repeat(500);
   const url = `https://odomo.marikita.party/?utm_source=%20%09newsletter%20&utm_campaign=${long}`;
   const { window, requests } = mount({
@@ -252,7 +390,8 @@ test("campaign values are trimmed and bounded", async () => {
 
   const [pageview] = trackedEvents(requests);
   assert.equal(pageview.properties.utm_source, "newsletter");
-  assert.equal(pageview.properties.utm_campaign.length, 120);
+  assert.equal(pageview.properties.utm_campaign, undefined);
+  assert.equal(window.location.search, "?utm_source=newsletter");
 });
 
 function runBuild(out, env) {

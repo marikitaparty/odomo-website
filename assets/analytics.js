@@ -22,15 +22,24 @@
     "utm_content",
     "utm_term",
   ];
-  const MAX_UTM_LENGTH = 120;
+  const MAX_UTM_LENGTH = 64;
+  // Match the app's attribution slug contract: no spaces, "@", or free text.
+  // This preserves arbitrary campaign tokens (including the required `x`)
+  // without forwarding names, emails, or phone-number-shaped values.
+  const UTM_SLUG = /^[a-z0-9_.-]+$/;
 
-  /** A campaign value, trimmed and bounded; empty when it has no usable value. */
+  /** Keep short slug values; drop free text and phone-number-shaped values. */
   function readUtmValue(raw) {
     if (typeof raw !== "string") return "";
-    return raw
-      .replace(/[\u0000-\u001f\u007f]/g, "")
-      .trim()
-      .slice(0, MAX_UTM_LENGTH);
+    const trimmed = raw.trim();
+    if (/[\u0000-\u001f\u007f]/.test(trimmed)) return "";
+    const value = trimmed.toLowerCase();
+    if (value.length === 0 || value.length > MAX_UTM_LENGTH) return "";
+    const phoneDigits = value.replace(/[.-]/g, "");
+    const phoneLike =
+      /^[\d.-]+$/.test(value) && /^\d{7,15}$/.test(phoneDigits);
+    if (!UTM_SLUG.test(value) || phoneLike) return "";
+    return value;
   }
 
   /** The utm_* parameters on the current URL, shaped as event properties. */
@@ -42,6 +51,19 @@
       if (value) campaign[key] = value;
     }
     return campaign;
+  }
+  /** Keep untrusted query keys out of the SDK's automatic page URL. */
+  function retainCampaignInLocation(campaign) {
+    const campaignQuery = new URLSearchParams(campaign).toString();
+    const pagePath = window.location.pathname;
+    const hash = window.location.hash;
+    const safeUrl = campaignQuery
+      ? `${pagePath}?${campaignQuery}${hash}`
+      : `${pagePath}${hash}`;
+    const currentUrl = `${pagePath}${window.location.search}${hash}`;
+    if (safeUrl !== currentUrl) {
+      window.history.replaceState(window.history.state, "", safeUrl);
+    }
   }
 
   /** `href` with the campaign appended, so the store listing carries it too. */
@@ -165,6 +187,7 @@
   }
 
   const campaign = readCampaign(window.location.search);
+  retainCampaignInLocation(campaign);
   upgradeStoreLinks(campaign);
   trackStoreClicks(campaign);
   startAnalytics(campaign);
