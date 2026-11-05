@@ -25,21 +25,23 @@ const PAGES = [
   "terms-of-service.html",
 ];
 
-const [HTML, GET_HTML, ANALYTICS, SDK, COMMITTED_CONFIG] = await Promise.all([
-  read("index.html"),
-  read("get.html"),
-  read("assets/analytics.js"),
-  read("assets/op1.js"),
-  read("assets/analytics-config.js"),
-]);
+const [HTML, GET_HTML, GET_JS, ANALYTICS, SDK, COMMITTED_CONFIG] =
+  await Promise.all([
+    read("index.html"),
+    read("get.html"),
+    read("assets/get.js"),
+    read("assets/analytics.js"),
+    read("assets/op1.js"),
+    read("assets/analytics-config.js"),
+  ]);
 
 const API_URL = "https://events.example/api";
 const CAMPAIGN_URL =
   "https://odomo.marikita.party/?utm_source=newsletter&utm_medium=email&utm_campaign=launch&utm_content=hero";
 
 /** Mounts a page, stubs fetch, then runs analytics.js with `config` in place. */
-function mount({ config, url = CAMPAIGN_URL, beforeInit } = {}) {
-  const dom = new JSDOM(HTML, {
+function mount({ config, url = CAMPAIGN_URL, beforeInit, html = HTML } = {}) {
+  const dom = new JSDOM(html, {
     url,
     referrer: "https://news.example/article",
     runScripts: "outside-only",
@@ -127,6 +129,33 @@ test("get landing page keeps its Play action inert and counts allowed campaign v
   assert.equal(storeClick?.[2].foo, undefined);
 });
 
+test("iPadOS desktop-mode user agents lead with the parked App Store control", () => {
+  const dom = new JSDOM(GET_HTML, {
+    url: "https://odomo.marikita.party/get",
+    runScripts: "outside-only",
+    beforeParse(window) {
+      Object.defineProperty(window.navigator, "userAgent", {
+        configurable: true,
+        value:
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15) " +
+          "AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Safari/605.1.15",
+      });
+      Object.defineProperty(window.navigator, "maxTouchPoints", {
+        configurable: true,
+        value: 5,
+      });
+    },
+  });
+
+  dom.window.eval(GET_JS);
+  assert.deepEqual(
+    [...dom.window.document.querySelectorAll("[data-store]")].map((store) =>
+      store.getAttribute("data-store"),
+    ),
+    ["app_store", "google_play"],
+  );
+});
+
 test("the committed config carries the public client id and the API base", () => {
   const clientId = COMMITTED_CONFIG.match(/clientId:\s*"([^"]*)"/)?.[1];
   assert.match(clientId ?? "", /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
@@ -178,6 +207,29 @@ test("a client id starts the tracker and sends one pageview with the campaign", 
   assert.equal(pageview.properties.utm_term, undefined);
   assert.equal(pageview.properties.__path, CAMPAIGN_URL);
   assert.equal(pageview.properties.__referrer, "https://news.example/article");
+});
+
+test("pageview URLs retain campaign keys but drop unknown and PII query parameters", async () => {
+  const url =
+    "https://odomo.marikita.party/get?utm_source=meta&utm_campaign=x&email=alice%40example.com&foo=1";
+  const { window, requests } = mount({
+    config: { clientId: "test-client", apiUrl: API_URL },
+    url,
+    html: GET_HTML,
+  });
+
+  loadSdk(window);
+  await flush();
+
+  const [pageview] = trackedEvents(requests);
+  assert.equal(
+    pageview.properties.__path,
+    "https://odomo.marikita.party/get?utm_source=meta&utm_campaign=x",
+  );
+  assert.equal(window.location.search, "?utm_source=meta&utm_campaign=x");
+  assert.equal(pageview.properties.utm_source, "meta");
+  assert.equal(pageview.properties.utm_campaign, "x");
+  assert.doesNotMatch(JSON.stringify(pageview.properties), /alice|email|foo/i);
 });
 
 test("session replay cannot start", async () => {

@@ -43,6 +43,19 @@
     }
     return campaign;
   }
+  /** Keep untrusted query keys out of the SDK's automatic page URL. */
+  function retainCampaignInLocation(campaign) {
+    const campaignQuery = new URLSearchParams(campaign).toString();
+    const pagePath = window.location.pathname;
+    const hash = window.location.hash;
+    const safeUrl = campaignQuery
+      ? `${pagePath}?${campaignQuery}${hash}`
+      : `${pagePath}${hash}`;
+    const currentUrl = `${pagePath}${window.location.search}${hash}`;
+    if (safeUrl !== currentUrl) {
+      window.history.replaceState(window.history.state, "", safeUrl);
+    }
+  }
 
   /** `href` with the campaign appended, so the store listing carries it too. */
   function appendCampaign(href, campaign) {
@@ -165,6 +178,7 @@
   }
 
   const campaign = readCampaign(window.location.search);
+  retainCampaignInLocation(campaign);
   upgradeStoreLinks(campaign);
   trackStoreClicks(campaign);
   startAnalytics(campaign);
