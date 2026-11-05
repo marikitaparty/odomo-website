@@ -232,6 +232,28 @@ test("pageview URLs retain campaign keys but drop unknown and PII query paramete
   assert.doesNotMatch(JSON.stringify(pageview.properties), /alice|email|foo/i);
 });
 
+test("pageview UTM values that look like contact details are dropped", async () => {
+  const url =
+    "https://odomo.marikita.party/get?utm_source=alice%40example.com&utm_term=%2B6281234567890&utm_campaign=launch";
+  const { window, requests } = mount({
+    config: { clientId: "test-client", apiUrl: API_URL },
+    url,
+    html: GET_HTML,
+  });
+
+  loadSdk(window);
+  await flush();
+
+  const [pageview] = trackedEvents(requests);
+  assert.equal(pageview.properties.__path, "https://odomo.marikita.party/get?utm_campaign=launch");
+  assert.equal(window.location.search, "?utm_campaign=launch");
+  assert.equal(pageview.properties.utm_source, undefined);
+  assert.equal(pageview.properties.utm_term, undefined);
+  assert.equal(pageview.properties.utm_campaign, "launch");
+  assert.doesNotMatch(JSON.stringify(pageview.properties), /alice|6281234567890/i);
+});
+
+
 test("session replay cannot start", async () => {
   const { window, requests } = mount({
     config: { clientId: "test-client", apiUrl: API_URL },

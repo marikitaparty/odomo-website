@@ -23,14 +23,18 @@
     "utm_term",
   ];
   const MAX_UTM_LENGTH = 120;
+  const EMAIL_LIKE = /\b[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}\b/i;
+  const PHONE_LIKE =
+    /\+\s*\d(?:[\s().-]*\d){6,}|(?:\(\d{3}\)\s*\d{3}[-.\s]\d{4})|\b\d{3}[-.\s]\d{3}[-.\s]\d{4}\b/;
 
-  /** A campaign value, trimmed and bounded; empty when it has no usable value. */
+  /** A bounded campaign value; likely personal contact details are not campaign labels. */
   function readUtmValue(raw) {
     if (typeof raw !== "string") return "";
-    return raw
+    const value = raw
       .replace(/[\u0000-\u001f\u007f]/g, "")
       .trim()
       .slice(0, MAX_UTM_LENGTH);
+    return EMAIL_LIKE.test(value) || PHONE_LIKE.test(value) ? "" : value;
   }
 
   /** The utm_* parameters on the current URL, shaped as event properties. */
