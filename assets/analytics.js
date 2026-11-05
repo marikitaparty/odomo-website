@@ -24,8 +24,8 @@
   ];
   const MAX_UTM_LENGTH = 120;
   const EMAIL_LIKE = /\b[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}\b/i;
-  const PHONE_LIKE =
-    /\+\s*\d(?:[\s().-]*\d){6,}|(?:\(\d{3}\)\s*\d{3}[-.\s]\d{4})|\b\d{3}[-.\s]\d{3}[-.\s]\d{4}\b/;
+  const PHONE_SHAPE = /^\+?\d[\d().\s-]*$/;
+  const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
   /** A bounded campaign value; likely personal contact details are not campaign labels. */
   function readUtmValue(raw) {
@@ -34,7 +34,9 @@
       .replace(/[\u0000-\u001f\u007f]/g, "")
       .trim()
       .slice(0, MAX_UTM_LENGTH);
-    return EMAIL_LIKE.test(value) || PHONE_LIKE.test(value) ? "" : value;
+    const digits = value.match(/\d/g)?.length ?? 0;
+    const phoneLike = digits >= 7 && PHONE_SHAPE.test(value) && !ISO_DATE.test(value);
+    return EMAIL_LIKE.test(value) || phoneLike ? "" : value;
   }
 
   /** The utm_* parameters on the current URL, shaped as event properties. */

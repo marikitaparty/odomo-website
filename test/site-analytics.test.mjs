@@ -234,7 +234,7 @@ test("pageview URLs retain campaign keys but drop unknown and PII query paramete
 
 test("pageview UTM values that look like contact details are dropped", async () => {
   const url =
-    "https://odomo.marikita.party/get?utm_source=alice%40example.com&utm_term=%2B6281234567890&utm_campaign=launch";
+    "https://odomo.marikita.party/get?utm_source=alice%40example.com&utm_term=6281234567890&utm_campaign=launch&utm_content=2026-11-05";
   const { window, requests } = mount({
     config: { clientId: "test-client", apiUrl: API_URL },
     url,
@@ -245,11 +245,13 @@ test("pageview UTM values that look like contact details are dropped", async () 
   await flush();
 
   const [pageview] = trackedEvents(requests);
-  assert.equal(pageview.properties.__path, "https://odomo.marikita.party/get?utm_campaign=launch");
-  assert.equal(window.location.search, "?utm_campaign=launch");
+  const safePath = "https://odomo.marikita.party/get?utm_campaign=launch&utm_content=2026-11-05";
+  assert.equal(pageview.properties.__path, safePath);
+  assert.equal(window.location.search, "?utm_campaign=launch&utm_content=2026-11-05");
   assert.equal(pageview.properties.utm_source, undefined);
   assert.equal(pageview.properties.utm_term, undefined);
   assert.equal(pageview.properties.utm_campaign, "launch");
+  assert.equal(pageview.properties.utm_content, "2026-11-05");
   assert.doesNotMatch(JSON.stringify(pageview.properties), /alice|6281234567890/i);
 });
 
