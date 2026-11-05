@@ -51,10 +51,11 @@ Every page includes both scripts, config first:
   parameters, and `destination` when the store URL is configured.
 - Only `utm_source`, `utm_medium`, `utm_campaign`, `utm_content` and
   `utm_term` are considered. Unknown query parameters are dropped.
-- Values are lowercased, trimmed, limited to 64 characters and must match the
-  attribution-slug format `[a-z0-9_.-]+`; free text and phone-shaped values
-  (7–15 digits) are dropped before analytics, URL rewriting or store links.
-  `utm_term` is retained only when it meets the same slug rules.
+- Control characters are rejected. Other values are lowercased, trimmed,
+  limited to 64 characters and must match the attribution-slug format
+  `[a-z0-9_.-]+`; free text and phone-shaped values (7–15 digits) are dropped
+  before analytics, URL rewriting or store links. `utm_term` is retained only
+  when it meets the same slug rules.
 
 Request bodies go to `${apiUrl}/track` (`https://events.marikita.party/api/track`
 in production).

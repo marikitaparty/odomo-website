@@ -31,10 +31,9 @@
   /** Keep short slug values; drop free text and phone-number-shaped values. */
   function readUtmValue(raw) {
     if (typeof raw !== "string") return "";
-    const value = raw
-      .replace(/[\u0000-\u001f\u007f]/g, "")
-      .trim()
-      .toLowerCase();
+    const trimmed = raw.trim();
+    if (/[\u0000-\u001f\u007f]/.test(trimmed)) return "";
+    const value = trimmed.toLowerCase();
     if (value.length === 0 || value.length > MAX_UTM_LENGTH) return "";
     const phoneDigits = value.replace(/[.-]/g, "");
     const phoneLike =

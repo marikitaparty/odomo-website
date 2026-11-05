@@ -260,7 +260,7 @@ test("the documented meta campaign slug reaches Play as an install referrer", as
 
 test("pageview and store links drop unapproved, free-text and phone-like UTM values", async () => {
   const url =
-    "https://odomo.marikita.party/get?utm_source=alice%40example.com&utm_medium=555-123-4567&utm_term=6281234567890&utm_campaign=Jane%20Doe&utm_content=hero";
+    "https://odomo.marikita.party/get?utm_source=alice%40example.com&utm_medium=555-123-4567&utm_term=6281234567890&utm_campaign=Jane%0ADoe&utm_content=hero";
   const html = GET_HTML.replace(
     'data-store="google_play" data-store-url=""',
     'data-store="google_play" data-store-url="https://play.google.com/store/apps/details?id=com.useodomo.app"',
