@@ -71,8 +71,8 @@
           How your records, account, and selected photos are handled.
         </p>
         <p class="revision">
-          <span class="policy-version">Version 2026.11-3</span><br />
-          Last updated: <time datetime="2026-11-08">November 8, 2026</time>
+          <span class="policy-version">Version 2026.11-4</span><br />
+          Last updated: <time datetime="2026-11-12">November 12, 2026</time>
         </p>
       </div>
       <div class="wrap legal-body">
@@ -169,13 +169,16 @@
               installation. We use it to understand which features are used, to
               find and fix crashes, and to measure whether our store links
               work. It is not used to show you advertising, and we do not sell
-              it.
+              it, except for the optional ad measurement described under “Ad
+              measurement (optional)” below, which is off unless you turn it
+              on.
             </p>
             <p>
               Analytics events and crash reports are received by servers we
               operate ourselves, not by a third-party analytics or
               crash-reporting service, and they are sent over an encrypted
-              connection. This information never includes your records, your
+              connection. The one exception is the optional ad measurement
+              described below, which is off unless you turn it on. This information never includes your records, your
               photos, the text read from a photo, your name, your email address,
               or your account identifier.
             </p>
@@ -201,7 +204,10 @@
               identifier, and not derived from your email or any other personal
               detail. We do not link it to your account or combine it with data
               from other apps or websites. The only campaign information we keep
-              is described under install attribution below.
+              is described under install attribution below. If you turn on ad
+              measurement, the campaign name, ad network and ad set that
+              brought you to Odomo may also appear as anonymous properties on
+              these events; they are never identifiers.
             </p>
             <p>
               You can turn app analytics off at any time in
@@ -253,6 +259,40 @@
               Attribution runs only while app analytics is on, and it is sent
               once. With analytics off, the app does not read the referrer or
               ask Apple for an attribution token at all.
+            </p>
+            <h3>Ad measurement (optional)</h3>
+            <p>
+              If you turn on
+              <strong>Settings → Privacy → Attribution and ad measurement</strong>,
+              Odomo shares limited data with AppsFlyer, our measurement
+              partner, so we can learn which advertisement led to your install
+              and which ads lead to subscriptions. This switch is off by
+              default in every region and is separate from Anonymous
+              analytics: turning one on or off does not change the other.
+            </p>
+            <p>
+              The data includes your IP address, device identifiers, your
+              device’s advertising identifier (the Android advertising ID, or
+              the iOS advertising identifier only if you allow tracking when
+              iOS asks), and events such as install, session and purchase.
+              Purchase events (subscription start, purchase and refund) are
+              sent server to server by our billing provider, Adapty, together
+              with the AppsFlyer identifier. We do not collect the Android ID.
+              AppsFlyer processes this data on our behalf and may pass
+              conversion information to the advertising networks we use
+              (currently Meta) so that they can measure and optimise our ads.
+              We do not send your account details, vehicle data, entries,
+              photos or scans to AppsFlyer.
+            </p>
+            <p>
+              We use this only to measure and improve advertising. Nothing in
+              Odomo depends on it. You can turn it off at any time in Settings.
+              Turning it off stops the AppsFlyer SDK and prevents it from
+              starting on later launches, but it does not recall data that was
+              already sent. To ask for deletion of data sent to AppsFlyer,
+              contact us at the address in section 11 and we will pass your
+              request on to AppsFlyer. AppsFlyer keeps data under its own
+              retention terms.
             </p>
             <h3>Analytics on this website</h3>
             <p>
@@ -362,7 +402,8 @@
               are not third-party products. We run them ourselves on a server
               we control, and we do not share what they receive with analytics
               vendors, advertising networks, data brokers, or any other third
-              party. Traffic to that server passes through Cloudflare’s
+              party. The only exception is the optional ad measurement
+              described in section 3, which is off unless you turn it on. Traffic to that server passes through Cloudflare’s
               network, which acts as our network provider. We do not sell
               personal information.
             </p>
@@ -375,6 +416,13 @@
               may also process transaction information under its own terms.
             </p>
             <p>
+              If you turn on ad measurement (section 3), AppsFlyer acts as our
+              service provider and processes the data described there on our
+              behalf, and may pass conversion information to the advertising
+              networks we use (currently Meta). This happens only if you opt
+              in.
+            </p>
+            <p>
               Information may also need to be disclosed to comply with
               applicable law or a valid legal request, or to address
               account-security issues.
@@ -383,14 +431,16 @@
           <section id="transfers">
             <h2>9. Processing locations and security</h2>
             <p>
-              Cloud and AI providers may process information outside the country
-              where you live. Contact support for provider and location details
+              Cloud and AI providers, and AppsFlyer if you turn on ad
+              measurement, may process information outside the country where
+              you live. Contact support for provider and location details
               or questions about applicable safeguards.
             </p>
             <p>
               Analytics events and crash reports are processed on a server we
               operate ourselves, not by a third-party analytics or
-              crash-reporting platform. The resulting dashboards are not
+              crash-reporting platform, except for the optional ad measurement
+              described in section 3, which is off unless you turn it on. The resulting dashboards are not
               reachable from the public internet; only the ingest endpoints,
               events.marikita.party and errors.marikita.party (with their
               staging equivalents), accept data. Contact support for the current
@@ -427,9 +477,13 @@
             <p>
               We have not yet fixed a retention period for analytics events or
               crash reports. Until we do, they remain stored on our self-hosted
-              systems and this policy states no period; when a period is set it
+              systems (data you choose to share with AppsFlyer through ad
+              measurement is kept under AppsFlyer’s own retention terms) and
+              this policy states no period; when a period is set it
               will be published here. Turning app analytics off stops new
               events but does not remove events that were already received.
+              Likewise, turning off ad measurement does not recall data
+              already sent to AppsFlyer.
             </p>
             <p>
               Some information may need to remain for a legal obligation or a
@@ -464,14 +518,18 @@
               You can stop app analytics and install attribution at any time in
               <strong>Settings → Privacy → Anonymous analytics</strong>, as
               described in section 3. Crash reports currently have no separate
-              setting.
+              setting. Ad measurement is a separate, optional switch,
+              <strong>Settings → Privacy → Attribution and ad measurement</strong>,
+              which is off by default and can be turned off at any time.
             </p>
             <p>
               To ask us to delete analytics events or crash reports, contact us
               using the address above. Because those streams are not linked to
               your account, we may need information from you to find the
               records, and we may not be able to identify all of them; we will
-              explain what we can do in your case.
+              explain what we can do in your case. For data sent to AppsFlyer
+              through ad measurement, we will pass your deletion request on to
+              AppsFlyer.
             </p>
             <p>
               You can manage camera and photo permissions through your device
