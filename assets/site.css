@@ -179,7 +179,8 @@ main:focus {
   margin-top: 10px;
 }
 .get-hero-art img {
-  width: min(100%, 520px);
+  width: min(100%, 380px);
+  height: auto;
   margin: auto;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lift);
