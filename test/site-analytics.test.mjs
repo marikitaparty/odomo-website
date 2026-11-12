@@ -177,7 +177,9 @@ test("without a client id nothing loads and store clicks send nothing", async ()
   const googlePlay = click(window, '[data-store="google_play"]');
   await flush();
 
-  assert.equal(appStore.defaultPrevented, true);
+  // The App Store listing is live, so its badge is a real link and navigates;
+  // Google Play is still parked and stays inert.
+  assert.equal(appStore.defaultPrevented, false);
   assert.equal(googlePlay.defaultPrevented, true);
   assert.deepEqual(requests, []);
 });
@@ -321,7 +323,7 @@ test("each store button emits store_click carrying the campaign", async () => {
   const googlePlay = click(window, '[data-store="google_play"]');
   await flush();
 
-  assert.equal(appStore.defaultPrevented, true);
+  assert.equal(appStore.defaultPrevented, false);
   assert.equal(googlePlay.defaultPrevented, true);
   const clicks = trackedEvents(requests).filter(
     (event) => event.name === "store_click",
@@ -336,7 +338,12 @@ test("each store button emits store_click carrying the campaign", async () => {
     assert.equal(event.properties.utm_campaign, "launch");
     assert.equal(event.properties.utm_content, "hero");
     assert.equal(event.properties.__path, CAMPAIGN_URL);
-    assert.equal(event.properties.destination, undefined);
+    // Only the live App Store link has a destination; parked Play has none.
+    if (event.properties.store === "app_store") {
+      assert.match(event.properties.destination, /^https:\/\/apps\.apple\.com\/app\/id6830522799/);
+    } else {
+      assert.equal(event.properties.destination, undefined);
+    }
   }
 });
 

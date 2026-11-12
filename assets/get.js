@@ -7,13 +7,11 @@
   const userAgent = navigator.userAgent || "";
   const appStore = stores.querySelector('[data-store="app_store"]');
   const googlePlay = stores.querySelector('[data-store="google_play"]');
-  const isIPadOSDesktop =
-    /Macintosh/i.test(userAgent) && navigator.maxTouchPoints > 1;
-  const isAppleMobile =
-    /iPhone|iPad|iPod/i.test(userAgent) || isIPadOSDesktop;
+  const isAndroid = /Android/i.test(userAgent);
 
-  // Android and desktop traffic lead with Play. Apple mobile traffic leads with
-  // the parked App Store control until that listing is available.
-  if (isAppleMobile && appStore) stores.prepend(appStore);
-  else if (googlePlay) stores.prepend(googlePlay);
+  // Android traffic leads with Play. Everyone else leads with the App Store,
+  // the only live listing; Play stays a parked control until its listing is
+  // available.
+  if (isAndroid && googlePlay) stores.prepend(googlePlay);
+  else if (appStore) stores.prepend(appStore);
 })();

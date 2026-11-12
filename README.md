@@ -107,11 +107,13 @@ Verify the live pages by content, not status code: the custom domain redirects
 `*.html` to the clean path (`/privacy-policy`, `/terms-of-service`) and the
 redirect's own body is empty, so `curl -L` is required.
 
-### Store links (pending listings)
+### Store links
 
-Both badges are inert while the listings are pending: clicks are counted, and
-nothing navigates. When a listing exists, put its URL in the badge's
-`data-store-url` attribute in `index.html` and `index-website.html`:
+The App Store badge is live (`https://apps.apple.com/app/id6830522799`, set in
+`data-store-url` and `href` on `index.html`, `index-website.html` and
+`get.html`). The Google Play badge is inert until its listing exists: clicks are
+counted and nothing navigates. When a listing exists, put its URL in the badge's
+`data-store-url` attribute in `index.html`, `index-website.html` and `get.html`:
 
 - App Store: `https://apps.apple.com/app/id<APP_ID>`
 - Google Play: `https://play.google.com/store/apps/details?id=com.useodomo.app`
